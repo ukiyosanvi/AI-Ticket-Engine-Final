@@ -1,0 +1,38 @@
+:root {
+    --primary: #4e73df;
+    --secondary: #1cc88a;
+    --dark: #2c3e50;
+    --light: #f8f9fc;
+    --gradient: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+}
+
+body { font-family: 'Inter', sans-serif; background-color: var(--light); margin: 0; display: flex; min-height: 100vh; color: var(--dark); }
+
+/* Login Page Specific */
+.login-body { justify-content: center; align-items: center; background: var(--gradient); }
+.login-card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 400px; text-align: center; }
+
+/* Sidebar Navigation */
+.sidebar { width: 250px; background: var(--dark); color: white; padding: 1.5rem; }
+.sidebar h2 { font-size: 1.2rem; margin-bottom: 2rem; color: var(--secondary); }
+.nav-link { display: block; color: rgba(255,255,255,0.8); text-decoration: none; padding: 12px; border-radius: 8px; margin-bottom: 10px; transition: 0.3s; }
+.nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
+
+/* Main Content Area */
+.main-content { flex: 1; padding: 2rem; overflow-y: auto; }
+
+/* Dashboard Cards */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+.stat-card { background: white; padding: 1.5rem; border-radius: 12px; border-left: 5px solid var(--primary); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.stat-card.green { border-left-color: var(--secondary); }
+.stat-card h3 { font-size: 0.8rem; text-transform: uppercase; margin: 0; color: #888; }
+.stat-card .value { font-size: 1.8rem; font-weight: bold; margin-top: 10px; }
+
+/* Forms & Tables */
+.form-container { background: white; padding: 2rem; border-radius: 12px; max-width: 700px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
+.btn { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block; }
+.btn-success { background: var(--secondary); }
+
+/* AI Solution Box */
+.ai-box { background: #f0f7ff; border: 1px solid #d0e3ff; padding: 1.5rem; border-radius: 12px; margin-top: 1rem; line-height: 1.6; }

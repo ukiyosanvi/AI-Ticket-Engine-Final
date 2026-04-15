@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Ticket Resolution</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', sans-serif; }
+        
+        /* Matching your Dashboard Navbar */
+        .navbar { background: var(--primary-gradient); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar-brand { color: white !important; font-weight: 700; }
+
+        /* Clean White "Cubicle" Card */
+        .solution-card { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 40px; 
+            margin-top: 50px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+            border: none;
+            text-align: left; /* Strict left alignment */
+        }
+
+        /* Status Badge Styling */
+        .status-badge { 
+            padding: 8px 16px; 
+            border-radius: 12px; 
+            font-weight: 800; 
+            font-size: 0.75rem; 
+            text-transform: uppercase;
+        }
+        .status-tentative { background: #fef3c7; color: #92400e; }
+        .status-resolved { background: #dcfce7; color: #15803d; }
+
+        /* Resolution Box - Pure Left Aligned */
+        .resolution-box { 
+            background: #f8fafc; 
+            border-left: 5px solid #764ba2; 
+            padding: 30px; 
+            border-radius: 0 15px 15px 0; 
+            white-space: pre-wrap; /* Keeps the line breaks from the AI */
+            color: #334155;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-top: 15px;
+        }
+
+        .label-text { 
+            font-size: 0.7rem; 
+            font-weight: 800; 
+            color: #94a3b8; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Confidence Progress Section */
+        .confidence-container { 
+            background: #f3e8ff; 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin-top: 30px; 
+        }
+        .progress { height: 10px; border-radius: 10px; background-color: #e2e8f0; }
+        .progress-bar { background: var(--primary-gradient); border-radius: 10px; }
+
+        .btn-back {
+            border: 2px solid #764ba2;
+            color: #764ba2;
+            font-weight: 700;
+            border-radius: 12px;
+            padding: 10px 25px;
+            transition: 0.3s;
+        }
+        .btn-back:hover { background: #764ba2; color: white; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('dashboard') }}"><i class="fas fa-robot me-2"></i> AI TICKET RESOLUTION</a>
+    </div>
+</nav>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="solution-card">
+                
+                <div class="d-flex justify-content-between align-items-center mb-5">
+                    <h3 class="fw-bold mb-0" style="color: #1e293b;">✨ AI Intelligence Report</h3>
+                    <span class="status-badge status-{{ ticket.resolution_status.lower() }}">
+                        {{ ticket.resolution_status }}
+                    </span>
+                </div>
+
+                <div class="mb-4">
+                    <span class="label-text">Incident Subject</span>
+                    <h4 class="fw-bold text-dark">{{ ticket.title or "New Incident Analysis" }}</h4>
+                </div>
+
+                <div class="mb-4">
+                    <span class="label-text">Resolution Strategy</span>
+                    <div class="resolution-box">
+                        {{ ticket.resolution_text | replace("**", "") | clean_md | safe }}
+                    </div>
+                </div>
+
+                <div class="confidence-container">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-primary small"><i class="fas fa-brain me-2"></i>RAG CONFIDENCE SCORE</span>
+                        <span class="fw-bold text-primary">{{ (ticket.confidence_score * 100) | round(1) }}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: {{ ticket.confidence_score * 100 }}%"></div>
+                    </div>
+                </div>
+
+                <div class="mt-5">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-back">
+                        <i class="fas fa-chevron-left me-2"></i> Back to Command Center
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
