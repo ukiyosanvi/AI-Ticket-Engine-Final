@@ -6,11 +6,21 @@ import os
 import pandas as pd
 import database
 import llm_engine
-import requests  # Ensure you've run 'pip install requests'
+import requests
+from dotenv import load_dotenv  # Ensure 'pip install python-dotenv' is run
+
+# --- LOAD ENVIRONMENT VARIABLES ---
+load_dotenv() 
 
 # --- CONFIGURATION ---
-# Your unique Slack URL - use environment variable
+# This will look for SLACK_WEBHOOK_URL in your .env file
 SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL", "")
+
+# Debugging: This will show in your terminal if the URL is loading correctly
+if not SLACK_WEBHOOK_URL:
+    print("⚠️ WARNING: SLACK_WEBHOOK_URL is empty. Check your .env file!")
+else:
+    print(f"✅ Slack Webhook loaded successfully: {SLACK_WEBHOOK_URL[:20]}...")
 
 STOP_WORDS = {"a", "an", "and", "are", "as", "at", "be", "by", "for", "from", "how", "i", "if", "in", "is", "it", "my", "of", "on", "or", "please", "the", "to", "was", "what", "when", "where", "with", "you", "your"}
 
@@ -31,7 +41,7 @@ def normalize_markdown(text):
     for line in text.splitlines():
         stripped = line.lstrip()
         indent = line[:len(line) - len(stripped)]
-        if stripped.startswith(("* ", "â€¢ ", "• ")):
+        if stripped.startswith(("* ", "• ", "• ")):
             normalized_lines.append(f"{indent} • {stripped[2:].lstrip()}")
         elif re.match(r"^\d+\)\s+", stripped):
             normalized_lines.append(f"{indent}{re.sub(r'^(\d+)\)\s+', r'\1. ', stripped)}")
@@ -43,6 +53,10 @@ def normalize_markdown(text):
 
 def send_slack_alert(ticket_title, category, priority, confidence):
     """Sends a professional, color-coded alert to Slack channel"""
+    if not SLACK_WEBHOOK_URL:
+        print("❌ Slack alert skipped: No Webhook URL configured.")
+        return
+
     if confidence < 0.4:
         color = "#ef4444"  # Red for Knowledge Gaps
         status_text = "⚠️ Knowledge Gap Detected"
@@ -70,7 +84,9 @@ def send_slack_alert(ticket_title, category, priority, confidence):
         ]
     }
     try:
-        requests.post(SLACK_WEBHOOK_URL, json=payload, timeout=5)
+        response = requests.post(SLACK_WEBHOOK_URL, json=payload, timeout=5)
+        if response.status_code != 200:
+            print(f"❌ Slack API Error: {response.status_code} - {response.text}")
     except Exception as e:
         print(f"Slack Alert Error: {e}")
 
@@ -137,13 +153,17 @@ def get_admin_kpis():
 def get_analytics_data():
     conn = database.get_db_connection()
     try:
+        # Fixed logic for pandas conversion
         df = pd.read_sql_query("SELECT category, AVG(confidence_score) as conf FROM tickets GROUP BY category", conn)
         labels = df['category'].tolist()
         values = [round(x, 2) for x in df['conf'].tolist()]
-        gaps = pd.read_sql_query("""
+        
+        gaps_df = pd.read_sql_query("""
             SELECT category, normalized_query as topic, AVG(confidence_score) as conf, COUNT(*) as count 
             FROM tickets GROUP BY category, topic ORDER BY conf ASC LIMIT 5
-        """, conn).to_dict('records')
+        """, conn)
+        gaps = gaps_df.to_dict('records')
+        
         return labels, values, gaps
     finally:
         conn.close()
